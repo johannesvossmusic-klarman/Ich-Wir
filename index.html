@@ -14,7 +14,7 @@
 :root{--forest:#203b2c;--forest2:#2f513b;--moss:#647d59;--sage:#a9b99a;--mint:#dce7d7;--cream:#f5f3e9;--paper:#fbfaf5;--ink:#26352a;--muted:#788176;--line:#e5e7dc;--gold:#c4a675;--rose:#b77f70;--shadow:0 12px 35px rgba(36,58,41,.08)}
 *{box-sizing:border-box}html{background:var(--cream);scroll-behavior:smooth}body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 button,input,textarea{font:inherit}button{cursor:pointer}
-.voice-field{position:relative;margin-top:7px}.voice-field textarea{padding-top:39px}.voice-btn{position:absolute;right:7px;top:7px;z-index:1;border:1px solid #dfe7d9;background:#eef3e9;color:#36543b;border-radius:20px;padding:6px 10px;font-size:11px;font-weight:650;min-height:30px}.voice-btn:active{transform:scale(.98)}.voice-btn.recording{background:#e9d9d2;border-color:#d6b2a5;color:#7b3f32}.helper{font-size:11px;color:var(--muted);line-height:1.45;margin:6px 0 0}.compact-card{padding:15px 16px}.home-intro{margin-bottom:16px}.home-actions{display:flex;gap:9px;flex-wrap:wrap}.home-actions .btn{flex:1;min-width:130px}.more-link{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font-weight:650}.more-link:last-child{border-bottom:0}.more-link span:last-child{color:var(--moss);font-size:20px}.nav{grid-template-columns:repeat(5,1fr)}.app{max-width:560px;min-height:100svh;margin:0 auto;background:var(--paper);position:relative;padding-bottom:100px;box-shadow:0 0 60px rgba(38,53,42,.06)}
+.voice-field{position:relative;margin-top:7px}.voice-field textarea{padding-top:39px}.voice-help{font-size:10px;color:var(--muted);line-height:1.4;margin:5px 2px 0}.voice-btn{position:absolute;right:7px;top:7px;z-index:1;border:1px solid #dfe7d9;background:#eef3e9;color:#36543b;border-radius:20px;padding:6px 10px;font-size:11px;font-weight:650;min-height:30px}.voice-btn:active{transform:scale(.98)}.voice-btn.recording{background:#e9d9d2;border-color:#d6b2a5;color:#7b3f32}.helper{font-size:11px;color:var(--muted);line-height:1.45;margin:6px 0 0}.compact-card{padding:15px 16px}.home-intro{margin-bottom:16px}.home-actions{display:flex;gap:9px;flex-wrap:wrap}.home-actions .btn{flex:1;min-width:130px}.more-link{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 0;border:0;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);text-align:left;font-weight:650}.more-link:last-child{border-bottom:0}.more-link span:last-child{color:var(--moss);font-size:20px}.nav{grid-template-columns:repeat(5,1fr)}.app{max-width:560px;min-height:100svh;margin:0 auto;background:var(--paper);position:relative;padding-bottom:100px;box-shadow:0 0 60px rgba(38,53,42,.06)}
 .top{background:var(--forest);color:#f6f4e9;padding:calc(env(safe-area-inset-top) + 20px) 23px 27px;border-radius:0 0 28px 28px;position:relative;overflow:hidden}
 .top:after{content:"";position:absolute;width:230px;height:230px;border:1px solid rgba(219,231,215,.13);border-radius:50%;right:-90px;top:-100px;box-shadow:0 0 0 24px rgba(219,231,215,.035),0 0 0 50px rgba(219,231,215,.025)}
 .brand{font-size:12px;letter-spacing:.19em;color:#c5d2bd;font-weight:650}.brand b{color:#e2c99c}.top h1{font-family:Georgia,serif;font-size:35px;font-weight:400;letter-spacing:-.04em;margin:19px 0 5px}.top p{font-size:14px;color:#d5ddcf;margin:0;line-height:1.5}.toprow{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}.leaf{width:39px;height:39px;border-radius:50%;background:#385641;display:grid;place-items:center;font-size:20px}
@@ -259,20 +259,78 @@ function bindVoiceInputs(){
  document.querySelectorAll('#view textarea').forEach((ta)=>{
   if(ta.closest('.voice-field'))return;
   let wrap=document.createElement('div');wrap.className='voice-field';ta.parentNode.insertBefore(wrap,ta);wrap.appendChild(ta);
-  let draftKey=ta.dataset.story||ta.id;if(draftKey&&data.drafts?.[draftKey]!==undefined&&ta.value==='')ta.value=data.drafts[draftKey];if(draftKey)ta.addEventListener('input',()=>{data.drafts??={};data.drafts[draftKey]=ta.value;save()});let b=document.createElement('button');b.type='button';b.className='voice-btn';b.textContent='🎙 Sprechen';b.setAttribute('aria-label','Text per Spracheingabe einfügen');b.onclick=()=>startVoiceInput(ta,b);wrap.appendChild(b);
+  let draftKey=ta.dataset.story||ta.id;if(draftKey&&data.drafts?.[draftKey]!==undefined&&ta.value==='')ta.value=data.drafts[draftKey];if(draftKey)ta.addEventListener('input',()=>{data.drafts??={};data.drafts[draftKey]=ta.value;save()});let b=document.createElement('button');b.type='button';b.className='voice-btn';b.textContent='🎙 Diktieren';b.setAttribute('aria-label','Spracheingabe starten');b.onclick=()=>startVoiceInput(ta,b);wrap.appendChild(b);let help=document.createElement('div');help.className='voice-help';help.textContent='iPhone: Tippe auf Diktieren und dann auf das Mikrofon unten rechts auf der Tastatur.';wrap.appendChild(help);
  });
 }
 function startVoiceInput(ta,button){
  const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
- if(!Speech){ta.focus();toast('Nutze das Mikrofon auf deiner iPhone-Tastatur – der Text erscheint direkt hier.');return;}
- if(!window.isSecureContext && location.hostname!=='localhost'){ta.focus();toast('Spracheingabe benötigt eine sichere HTTPS-Verbindung.');return;}
- if(activeRecognition){try{activeRecognition.stop()}catch(e){}activeRecognition=null;document.querySelectorAll('.voice-btn.recording').forEach(b=>{b.classList.remove('recording');b.textContent='🎙 Sprechen'});return;}
- let recognition=new Speech();activeRecognition=recognition;recognition.lang='de-DE';recognition.continuous=false;recognition.interimResults=true;recognition.maxAlternatives=1;
- let initial=ta.value.trim();button.classList.add('recording');button.textContent='■ Aufnahme stoppen';
- recognition.onresult=(event)=>{let finalText='';let interim='';for(let i=event.resultIndex;i<event.results.length;i++){let part=event.results[i][0].transcript;if(event.results[i].isFinal)finalText+=part;else interim+=part;}if(finalText){ta.value=(initial?initial+' ':'')+finalText.trim()+' ';initial=ta.value.trim();ta.dispatchEvent(new Event('input',{bubbles:true}));}button.dataset.interim=interim;};
- recognition.onerror=(event)=>{let msg=event.error==='not-allowed'?'Mikrofonzugriff wurde nicht erlaubt.':event.error==='no-speech'?'Ich habe nichts gehört. Versuch es noch einmal.':'Die Spracheingabe konnte gerade nicht starten.';toast(msg);};
- recognition.onend=()=>{button.classList.remove('recording');button.textContent='🎙 Sprechen';button.dataset.interim='';if(activeRecognition===recognition)activeRecognition=null;};
- try{recognition.start();}catch(e){button.classList.remove('recording');button.textContent='🎙 Sprechen';activeRecognition=null;toast('Die Spracheingabe ist gerade nicht verfügbar.');}
+ // iOS Home Screen web apps often do not expose Web Speech Recognition.
+ // In that case, use Apple's built-in keyboard dictation rather than
+ // pretending that an in-app recording has started.
+ if(!Speech){
+   ta.focus();
+   ta.scrollIntoView({behavior:'smooth',block:'center'});
+   toast('Jetzt das Mikrofon unten rechts auf der iPhone-Tastatur antippen.');
+   return;
+ }
+ if(!window.isSecureContext && location.hostname!=='localhost'){
+   ta.focus();
+   toast('Für die direkte Spracheingabe wird HTTPS benötigt. Nutze das Tastaturmikrofon.');
+   return;
+ }
+ if(activeRecognition){
+   try{activeRecognition.stop()}catch(e){}
+   activeRecognition=null;
+   document.querySelectorAll('.voice-btn.recording').forEach(b=>{
+     b.classList.remove('recording');b.textContent='🎙 Diktieren';
+   });
+   return;
+ }
+ let recognition=new Speech();
+ activeRecognition=recognition;
+ recognition.lang='de-DE';
+ recognition.continuous=false;
+ recognition.interimResults=false;
+ recognition.maxAlternatives=1;
+ const before=ta.value;
+ button.classList.add('recording');
+ button.textContent='■ Beenden';
+ let gotResult=false;
+ recognition.onresult=(event)=>{
+   let spoken='';
+   for(let i=event.resultIndex;i<event.results.length;i++){
+     if(event.results[i].isFinal)spoken+=event.results[i][0].transcript;
+   }
+   if(spoken.trim()){
+     gotResult=true;
+     const separator=before.trim()?' ':'';
+     ta.value=before+separator+spoken.trim();
+     ta.dispatchEvent(new Event('input',{bubbles:true}));
+   }
+ };
+ recognition.onerror=(event)=>{
+   const messages={
+     'not-allowed':'Mikrofonzugriff nicht erlaubt. Bitte iPhone-Tastaturmikrofon verwenden.',
+     'service-not-allowed':'Diese iPhone-App unterstützt die direkte Erkennung hier nicht. Nutze das Tastaturmikrofon.',
+     'no-speech':'Ich habe nichts gehört. Versuch es noch einmal.',
+     'audio-capture':'Kein Mikrofon verfügbar. Nutze das Tastaturmikrofon.'
+   };
+   toast(messages[event.error]||'Direkte Spracheingabe nicht verfügbar. Nutze das Tastaturmikrofon.');
+ };
+ recognition.onend=()=>{
+   button.classList.remove('recording');
+   button.textContent='🎙 Diktieren';
+   if(activeRecognition===recognition)activeRecognition=null;
+   if(!gotResult){} 
+ };
+ try{recognition.start();}
+ catch(e){
+   button.classList.remove('recording');
+   button.textContent='🎙 Diktieren';
+   activeRecognition=null;
+   ta.focus();
+   toast('Direkte Spracheingabe nicht verfügbar. Tippe auf das Tastaturmikrofon.');
+ }
 }
 function toast(s){let x=document.createElement('div');x.textContent=s;x.style='position:fixed;bottom:92px;left:50%;transform:translateX(-50%);background:#203b2c;color:white;padding:12px 17px;border-radius:30px;font-size:13px;z-index:20;box-shadow:0 5px 20px #0002';document.body.appendChild(x);setTimeout(()=>x.remove(),2200)}
 function openCalm(){document.getElementById('calmModal').classList.add('show')}function closeCalm(){document.getElementById('calmModal').classList.remove('show')}function chooseCalm(b){document.querySelectorAll('#calmChoices .chip').forEach(x=>x.classList.remove('selected'));b.classList.add('selected')}
